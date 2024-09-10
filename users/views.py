@@ -9,7 +9,8 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from users.models import User
 # from users.serializers import UserSerializer, UserRegistrationSerializer, UserUpdateSerializer
-from users.serializers import UserRegistrationSerializer, UserSerializer
+from users.serializers import UserRegistrationSerializer, UserSerializer, PasswordResetRequestSerializer, \
+    PasswordResetSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from users.serializers import EmailConfirmationSerializer
@@ -87,4 +88,20 @@ class EmailConfirmationView(APIView):
             serializer.save()
             return Response({'message': 'Электронная почта успешно подтверждена. Теперь вы можете войти в систему.'},
                             status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Код сброса пароля отправлен на ваш email.'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordResetView(APIView):
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Пароль успешно изменен.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

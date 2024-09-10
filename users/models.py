@@ -34,6 +34,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)  # Use email as the unique identifier
     confirmation_code = models.CharField(max_length=4, blank=True, null=True)
     is_active = models.BooleanField(default=False) # Пользователь активен после подтверждения email
+    reset_code = models.CharField(max_length=6, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

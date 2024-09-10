@@ -87,3 +87,69 @@ class EmailConfirmationSerializer(serializers.Serializer):
         user.confirmation_code = None
         user.save()
         return user
+
+
+# users/serializers.py
+from django.core.mail import send_mail
+import random
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, data):
+        email = data['email']
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Пользователь с таким адресом электронной почты не найден.')
+        return data
+
+    def create(self, validated_data):
+        email = validated_data['email']
+        user = User.objects.get(email=email)
+        reset_code = str(random.randint(1000, 9999))
+
+        # Save the reset code to the user instance
+        user.reset_code = reset_code
+        user.save()
+
+        send_mail(
+            'Код для сброса пароля',
+            f'Ваш код для сброса пароля: {reset_code}',
+            'noreply@yourdomain.com',
+            [email],
+            fail_silently=False
+        )
+        return validated_data
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    reset_code = serializers.CharField(max_length=4)
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data['email']
+        reset_code = data['reset_code']
+        new_password = data['new_password']
+        confirm_password = data['confirm_password']
+
+        if new_password != confirm_password:
+            raise serializers.ValidationError('Пароли не совпадают.')
+
+        try:
+            user = User.objects.get(email=email, reset_code=reset_code)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Неверный адрес электронной почты или код сброса.')
+
+        return data
+
+    def create(self, validated_data):
+        email = validated_data['email']
+        new_password = validated_data['new_password']
+
+        user = User.objects.get(email=email)
+        user.set_password(new_password)
+        user.reset_code = None  # Clear the reset code after password reset
+        user.save()
+        return validated_data

@@ -79,5 +79,11 @@ class EmailConfirmationSerializer(serializers.Serializer):
         user.is_active = True
         user.confirmation_code = None
         user.save()
-
         return data
+
+    def create(self, validated_data):
+        user = User.objects.get(email=validated_data['email'])
+        user.is_active = True
+        user.confirmation_code = None
+        user.save()
+        return user

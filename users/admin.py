@@ -5,13 +5,11 @@ from users.models import User
 
 class UserCreationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Пароль")
-
-
     class Meta:
         model = User
-        fields = ( 'email', 'first_name', 'last_name')
+        fields = ('email', 'first_name', 'last_name')
 
-    \
+
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -28,9 +26,9 @@ class UserChangeForm(forms.ModelForm):
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
-    search_fields = ('username', 'email')
-    ordering = ('username',)
+    list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
+    search_fields = ('email',)
+    ordering = ('email',)
     filter_horizontal = ()
 
     fieldsets = (

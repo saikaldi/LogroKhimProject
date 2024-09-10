@@ -13,6 +13,15 @@ from users.serializers import UserRegistrationSerializer, UserSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from users.serializers import EmailConfirmationSerializer
+
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
 class UserViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -45,23 +54,31 @@ class UserViewSet(viewsets.ViewSet):
         user.delete()
         return Response({'message': 'Пользователь успешно удален'})
 
-    # @action(detail=False, methods=['post'])
-    # def login(self, request):
-    #     username = request.data.get('username')
-    #     password = request.data.get('password')
-    #     user = authenticate(username=username, password=password)
-    #     if user is not None:
-    #         token, created = Token.objects.get_or_create(user=user)
-    #         return Response({'token': token.key}, status=200)
-    #     return Response({'error': 'Неверные учетные данные'}, status=400)
-    #
-    # @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
-    # def logout(self, request):
-    #     try:
-    #         request.user.auth_token.delete()
-    #         return Response({'message': 'Успешно вышли'}, status=status.HTTP_200_OK)
-    #     except (AttributeError, ObjectDoesNotExist):
-    #         return Response({'error': 'Нет активной сессии'}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        print(f"Email: {email}")  # Debugging
+        print(f"Password: {password}")  # Debugging
+
+        user = authenticate(request, username=email, password=password)
+
+        print(f"Authenticated User: {user}")  # Debugging
+
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=200)
+
+        return Response({'error': 'Неверные учетные данные'}, status=400)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def logout(self, request):
+        try:
+            request.user.auth_token.delete()
+            return Response({'message': 'Успешно вышли'}, status=status.HTTP_200_OK)
+        except (AttributeError, ObjectDoesNotExist):
+            return Response({'error': 'Нет активной сессии'}, status=status.HTTP_400_BAD_REQUEST)
 
 class EmailConfirmationView(APIView):
     def post(self, request):

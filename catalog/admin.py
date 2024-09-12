@@ -8,7 +8,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Manufacturer)
 class ManufacturerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'slug')
+    list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
 
 @admin.register(Product)

@@ -6,19 +6,23 @@ from django.core.mail import send_mail
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email')
+        fields = ('id', 'first_name', 'last_name', 'email', 'organization_name', 'legal_address', 'physical_address', 'phone_number')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password')
+        fields = ('first_name', 'last_name', 'email', 'password', 'organization_name', 'legal_address', 'physical_address', 'phone_number')
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': False},
             'email': {'required': True},
             'password': {'required': True},
+            'organization_name' : {'required': False},
+            'legal_address' : {'required': False},
+            'physical_address' : { 'required': False},
+            'phone_number': {'required': False}
         }
 
     def validate(self, data):
@@ -36,7 +40,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
             is_active=False,
-            confirmation_code=confirmation_code
+            confirmation_code=confirmation_code,
+            organization_name=validated_data.get('organization_name', ''),
+            legal_address=validated_data.get('legal_address', ''),
+            physical_address=validated_data.get('physical_address', ''),
+            phone_number=validated_data.get('phone_number', '')
         )
 
 
@@ -53,12 +61,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('first_name', 'last_name', 'email', 'organization_name', 'legal_address', 'physical_address', 'phone_number')
 
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.email = validated_data.get('email', instance.email)
+        instance.organization_name = validated_data.get('organization_name', instance.organization_name)
+        instance.legal_address = validated_data.get('legal_address', instance.legal_address)
+        instance.physical_address = validated_data.get('physical_address', instance.physical_address)
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
         instance.save()
         return instance
 

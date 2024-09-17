@@ -36,6 +36,14 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False) # Пользователь активен после подтверждения email
     reset_code = models.CharField(max_length=6, blank=True, null=True)
 
+    # для личного кабинета
+    organization_name = models.CharField(max_length=255, blank=True, null=True)
+    legal_address = models.TextField(blank=True, null=True)
+    physical_address = models.TextField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+
+
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

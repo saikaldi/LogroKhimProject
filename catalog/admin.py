@@ -3,7 +3,7 @@ from .models import Category, Manufacturer, Product, Price
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'slug')
+    list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
 
 @admin.register(Manufacturer)

@@ -89,9 +89,6 @@ class EmailConfirmationSerializer(serializers.Serializer):
         return user
 
 
-# users/serializers.py
-from django.core.mail import send_mail
-import random
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

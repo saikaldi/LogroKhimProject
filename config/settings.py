@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -159,4 +160,17 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+
+JAZZMIN_SETTINGS = {
+    'site_title': 'LogroKhim',
+    'site_header': 'LogroKhim Admin',
+    'site_brand': 'LogroKhim',
+    'site_logo': '/static/images/logo.jpg',
+    'welcome_sign': 'Welcome to LogroKhim Admin',
+    'show_ui_builder': False,
+    'navigation_expanded': True,
+    'hide_apps': [],
+    'hide_models': [],
+}
 

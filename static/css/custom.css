@@ -1,0 +1,26 @@
+.brand-link .brand-image {
+float: left;
+line-height: .8;
+margin-left: .8rem;
+margin-right: .5rem;
+margin-top: -3px;
+max-height: 43px;
+width: auto;
+
+}
+.brand-link .brand-text {
+    display: none; /* Hides the brand text */
+}
+.brand-link {
+    display: flex; /* Ensure flexbox layout */
+    align-items: center; /* Center-align items vertically */
+}
+
+.brand-link .brand-text {
+    display: none; /* Hides the brand text */
+}
+
+.brand-link .brand-image {
+    max-height: 50px; /* Adjust height as needed */
+    width: auto; /* Maintain aspect ratio */
+}

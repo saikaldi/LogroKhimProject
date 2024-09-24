@@ -165,12 +165,14 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 JAZZMIN_SETTINGS = {
     'site_title': 'LogroKhim',
     'site_header': 'LogroKhim Admin',
-    'site_brand': 'LogroKhim',
-    'site_logo': '/static/images/logo.jpg',
+    'site_logo': '/images/Logo.jpg',
+    'site_logo_classes': 'img-circle',
+    'site_brand': None,
     'welcome_sign': 'Welcome to LogroKhim Admin',
     'show_ui_builder': False,
     'navigation_expanded': True,
     'hide_apps': [],
     'hide_models': [],
+    'custom_css': 'css/custom.css',
 }
 

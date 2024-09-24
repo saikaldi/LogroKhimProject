@@ -32,15 +32,16 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)  # Use email as the unique identifier
-    confirmation_code = models.CharField(max_length=4, blank=True, null=True)
-    is_active = models.BooleanField(default=False) # Пользователь активен после подтверждения email
-    reset_code = models.CharField(max_length=6, blank=True, null=True)
+    confirmation_code = models.CharField(max_length=4, blank=True, null=True, verbose_name="Код подтверждения")
+    is_active = models.BooleanField(default=False, verbose_name="Пользователь активен") #Пользователь активен после
+    # подтверждения email
+    reset_code = models.CharField(max_length=6, blank=True, null=True, verbose_name="Код сброса")
 
     # для личного кабинета
-    organization_name = models.CharField(max_length=255, blank=True, null=True)
-    legal_address = models.TextField(blank=True, null=True)
-    physical_address = models.TextField(blank=True, null=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    organization_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Название организации")
+    legal_address = models.TextField(blank=True, null=True, verbose_name="Юридический адрес")
+    physical_address = models.TextField(blank=True, null=True, verbose_name="Физический адрес")
+    phone_number = models.CharField(max_length=20, blank=True, null=True, verbose_name="Номер телефона")
 
 
 
@@ -50,9 +51,9 @@ class User(AbstractUser):
     objects = UserManager()
 
     class Meta:
-        db_table = 'user'
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
+        db_table = 'Пользователи'
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.email

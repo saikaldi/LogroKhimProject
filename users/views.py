@@ -13,6 +13,9 @@ from users.serializers import UserRegistrationSerializer, UserSerializer, Passwo
 from rest_framework import status
 from rest_framework.views import APIView
 from users.serializers import EmailConfirmationSerializer
+from django.http import HttpResponse
+from .utils import send_email_to_all_users, send_email_to_user
+
 
 
 class ProfileView(APIView):
@@ -100,3 +103,16 @@ class PasswordResetView(APIView):
             serializer.save()
             return Response({'message': 'Пароль успешно изменен.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def notify_all_users(request):
+    subject = 'Уведомление'
+    message = 'Это уведомление для всех пользователей'
+    send_email_to_all_users(subject, message)
+    return HttpResponse('Notification sent to all users.')
+
+def notify_user(request, user_email):
+    subject = 'Уведомление'
+    message = 'Это уведомление для выбранных пользователей'
+    send_email_to_user(user_email, subject, message)
+    return HttpResponse(f'Уведомление отправлено пользователю {user_email}.')

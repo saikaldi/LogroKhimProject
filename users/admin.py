@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from users.models import User
 from .forms import SendNotificationForm
 from django.core.mail import send_mail
-
+from .utils import send_email_to_all_users, send_email_to_user
 class UserCreationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Пароль")
 
@@ -44,37 +44,23 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('email', 'first_name', 'last_name', 'password')}),
     )
 
-    actions = ['send_email_to_all_users', 'send_email_to_selected_users']
+    actions = ['notify_all_users', 'notify_user']
 
-    def send_email_to_all_users(self, request, queryset):
-        if 'apply' in request.POST:
-            form = SendNotificationForm(request.POST)
-            if form.is_valid():
-                subject = form.cleaned_data['subject']
-                message = form.cleaned_data['message']
-                recipient_emails = [user.email for user in User.objects.all()]
-                send_mail(subject, message, 'ukyzsaikal@gmail.com', recipient_emails)
-                self.message_user(request, "Уведомление успешно отправлено всем пользователям.")
-                return None
-        else:
-            form = SendNotificationForm()
+    def notify_all_users(self, request, queryset):
+        subject = 'Уведомление'
+        message = 'Это уведомление для всех пользователей'
+        send_email_to_all_users(subject, message)
+        self.message_user(request, "Уведомление отправлено всем пользователям.")
 
-        return render(request, 'admin/send_notification_form.html', {'form': form})
+    notify_all_users.short_description = "Отправить уведомление всем пользователям"
+    def notify_user(self, request, queryset):
+        for user in queryset:
+            subject = 'Уведомление'
+            message = 'Это уведомление для выбранного пользователя'
+            send_email_to_user(user.email, subject, message)
+        self.message_user(request, "Уведомления отправлены выбранным пользователям.")
 
-    def send_email_to_selected_users(self, request, queryset):
-        if 'apply' in request.POST:
-            form = SendNotificationForm(request.POST)
-            if form.is_valid():
-                subject = form.cleaned_data['subject']
-                message = form.cleaned_data['message']
-                recipient_emails = [user.email for user in queryset]
-                send_mail(subject, message, 'ukyzsaikal@gmail.com', recipient_emails)
-                self.message_user(request, "Уведомление успешно отправлено выбранным пользователям.")
-                return None
-        else:
-            form = SendNotificationForm()
-
-        return render(request, 'admin/send_notification_form.html', {'form': form})
+    notify_user.short_description = "Отправить уведомление выбранным пользователя"
 
 # Register the User model with the custom UserAdmin
 admin.site.register(User, UserAdmin)

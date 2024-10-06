@@ -19,22 +19,13 @@ class CartViewSet(viewsets.ModelViewSet):
         product_id = request.data.get('product_id')
         product = Product.objects.get(id=product_id)
 
-        # Filter for existing cart items with the same product and user
-        cart_items = Cart.objects.filter(user=request.user, product=product, status='pending')
+        cart_item, created = Cart.objects.get_or_create(
+            user=request.user, product=product, status='pending'
+        )
 
-        if cart_items.exists():
-            # If cart item already exists, update the quantity of the first item found
-            cart_item = cart_items.first()
+        if not created:
             cart_item.quantity += 1
             cart_item.save()
-        else:
-            # If no existing cart item, create a new one
-            cart_item = Cart.objects.create(
-                user=request.user,
-                product=product,
-                quantity=1,
-                status='pending'
-            )
 
         serializer = self.get_serializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -52,4 +43,4 @@ class CartViewSet(viewsets.ModelViewSet):
         # Remove item from cart
         cart_item = self.get_object()
         cart_item.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Элемент корзины был удален."}, status=status.HTTP_204_NO_CONTENT)

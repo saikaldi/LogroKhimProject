@@ -7,6 +7,8 @@ router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('registration/', UserViewSet.as_view({'post': 'registration'}), name='registration'),
+    path('login/', UserViewSet.as_view({'post': 'login'}), name='login'),
     path('confirm-email/', EmailConfirmationView.as_view(), name='confirm-email'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('password-reset-request/', PasswordResetRequestView.as_view(), name='password-reset-request'),

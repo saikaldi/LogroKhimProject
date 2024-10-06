@@ -15,24 +15,27 @@ from rest_framework.views import APIView
 from users.serializers import EmailConfirmationSerializer
 from django.http import HttpResponse
 from .utils import send_email_to_all_users, send_email_to_user
-
+from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import permission_classes
 
 
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
-
     def get(self, request):
+        print(f'Request user ID: {request.user.id}')
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
 class UserViewSet(viewsets.ViewSet):
-    def create(self, request):
+
+    @action(detail=False, methods=['post'])
+    def registration(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save(is_active=False)  # Set user as inactive initially
-            # Email sending is handled in the serializer
-            return Response({'message': 'Пользователь создан успешно. Пожалуйста, подтвердите ваш email.'}, status=201)
+            user = serializer.save(is_active=False)  # Устанавливаем пользователя как неактивного
+            return Response({'message': 'Пользователь успешно создан. Пожалуйста, подтвердите ваш email.'}, status=201)
         return Response(serializer.errors, status=400)
+
     def list(self, request):
         queryset = User.objects.filter(is_active=True)
         serializer = UserSerializer(queryset, many=True)
@@ -60,7 +63,7 @@ class UserViewSet(viewsets.ViewSet):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, email=email, password=password)
 
         if user is not None:
             if not user.is_active:
@@ -104,15 +107,3 @@ class PasswordResetView(APIView):
             return Response({'message': 'Пароль успешно изменен.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-def notify_all_users(request):
-    subject = 'Уведомление'
-    message = 'Это уведомление для всех пользователей'
-    send_email_to_all_users(subject, message)
-    return HttpResponse('Notification sent to all users.')
-
-def notify_user(request, user_email):
-    subject = 'Уведомление'
-    message = 'Это уведомление для выбранных пользователей'
-    send_email_to_user(user_email, subject, message)
-    return HttpResponse(f'Уведомление отправлено пользователю {user_email}.')

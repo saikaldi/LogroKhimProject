@@ -12,25 +12,28 @@ class FavoriteViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-
+        # Only show favorites for the current user
         return Favorite.objects.filter(user=self.request.user)
 
     @action(detail=False, methods=['post'])
     def add(self, request):
         product_id = request.data.get('product_id')
         if not product_id:
-            return Response({'error': 'Product ID is required'}, status=400)
+            return Response({'error': 'Требуется ID продукта'}, status=400)
         product = get_object_or_404(Product, id=product_id)
         favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)
         if created:
-            return Response({'message': 'Product added to favorites'}, status=201)
-        return Response({'message': 'Product already in favorites'}, status=200)
+            return Response({'message': 'Продукт добавлен в избранное'}, status=201)
+        return Response({'message': 'Продукт уже в избранном'}, status=200)
 
     @action(detail=False, methods=['post'])
     def remove(self, request):
         product_id = request.data.get('product_id')
         if not product_id:
-            return Response({'error': 'Product ID is required'}, status=400)
+            return Response({'error': 'Требуется ID продукта'}, status=400)
         product = get_object_or_404(Product, id=product_id)
-        Favorite.objects.filter(user=request.user, product=product).delete()
-        return Response({'message': 'Product removed from favorites'}, status=200)
+        favorite = Favorite.objects.filter(user=request.user, product=product).first()
+        if favorite:
+            favorite.delete()
+            return Response({'message': 'Продукт удален из избранного'}, status=200)
+        return Response({'error': 'Продукт не найден в избранном'}, status=404)

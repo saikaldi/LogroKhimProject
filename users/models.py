@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """
@@ -29,11 +30,12 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)  # Use email as the unique identifier
     confirmation_code = models.CharField(max_length=4, blank=True, null=True, verbose_name="Код подтверждения")
-    is_active = models.BooleanField(default=False, verbose_name="Пользователь активен") #Пользователь активен после
+    is_active = models.BooleanField(default=False, verbose_name="Пользователь активен")  # Пользователь активен после
 
     # подтверждения email
     reset_code = models.CharField(max_length=6, blank=True, null=True, verbose_name="Код сброса")
@@ -43,8 +45,6 @@ class User(AbstractUser):
     legal_address = models.TextField(blank=True, null=True, verbose_name="Юридический адрес")
     physical_address = models.TextField(blank=True, null=True, verbose_name="Физический адрес")
     phone_number = models.CharField(max_length=20, blank=True, null=True, verbose_name="Номер телефона")
-
-
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

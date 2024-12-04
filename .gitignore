@@ -9,7 +9,7 @@ venv/
 .venv/
 
 # Django migrations
-*/migrations/
+
 */__pycache__/
 
 # Database files
